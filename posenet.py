@@ -6,13 +6,15 @@ from posenet.utils import *
 import json
 name="origin"
 testfile = "origin"+".jpg"
+testfile = input('模特图片路径：')
+print(testfile)
 net = load_model(101)
 net = net.cuda()
 output_stride = net.output_stride
 scale_factor = 1.0
 
 input_image, draw_image, output_scale = posenet.read_imgfile(testfile, scale_factor=scale_factor, output_stride=output_stride)
-#print(input_image)
+print(input_image.shape)
 with torch.no_grad():
     input_image = torch.Tensor(input_image).cuda()
 
@@ -26,6 +28,7 @@ with torch.no_grad():
         output_stride=output_stride,
         max_pose_detections=20,
         min_pose_score=0.1)
+#print(pose_scores, len(pose_scores))
 poses = []
 # find face keypoints & detect face mask
 for pi in range(len(pose_scores)):
