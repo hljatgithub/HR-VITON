@@ -13,7 +13,8 @@ if __name__ == '__main__':
     opt = parser.parse_args()
     
     # Read input image
-    img=cv2.imread("./static/origin_web.jpg")
+    original_path = input('模特图片路径：')
+    img=cv2.imread(original_path)
     ori_img=cv2.resize(img,(768,1024))
     cv2.imwrite("./origin.jpg",ori_img)
 
@@ -33,6 +34,7 @@ if __name__ == '__main__':
     os.system(terminnal_command)
 
     # Generate semantic segmentation using Graphonomy-Master library
+    # 人物部位识别、主体识别
     print("Generate semantic segmentation using Graphonomy-Master library\n")
     os.chdir("./Graphonomy-master")
     terminnal_command ="python exp/inference/inference.py --loadmodel ./inference.pth --img_path ../resized_img.jpg --output_path ../ --output_name /resized_segmentation_img"
@@ -47,6 +49,7 @@ if __name__ == '__main__':
     img_seg=cv2.bitwise_and(ori_img,ori_img,mask=mask_img)
     back_ground=ori_img-img_seg
     img_seg=np.where(img_seg==0,215,img_seg)
+    # 主体无背景图
     cv2.imwrite("./seg_img.png",img_seg)
     img=cv2.resize(img_seg,(768,1024))
     cv2.imwrite('./HR-VITON-main/test/test/image/00001_00.jpg',img)
