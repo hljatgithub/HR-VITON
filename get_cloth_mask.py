@@ -9,9 +9,11 @@ from cloths_segmentation.pre_trained_models import create_model
 import warnings
 warnings.filterwarnings("ignore")
 
+cloth_path = input('衣服图片路径：')
+
 model = create_model("Unet_2020-10-30")
 model.eval()
-image = load_rgb("./static/cloth_web.jpg")
+image = load_rgb(cloth_path)
 
 transform = albu.Compose([albu.Normalize(p=1)], p=1)
 
@@ -29,7 +31,7 @@ mask = unpad(mask, pads)
 img=np.full((1024,768,3), 255)
 seg_img=np.full((1024,768), 0)
 
-b=cv2.imread("./static/cloth_web.jpg")
+b=cv2.imread(cloth_path)
 b_img = mask* 255
                  
 if b.shape[1]<=600 and b.shape[0]<=500:
