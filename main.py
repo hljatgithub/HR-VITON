@@ -29,6 +29,7 @@ if __name__ == '__main__':
     os.system(terminnal_command)
 
     # Get openpose coordinate using posenet
+    # 生成关键点数据给HR-VITON训练预测
     print("Get openpose coordinate using posenet\n")
     terminnal_command = "python posenet.py" 
     os.system(terminnal_command)
@@ -42,10 +43,12 @@ if __name__ == '__main__':
     os.chdir("../")
 
     # Remove background image using semantic segmentation mask
+    # 读取上面输出的主体图
     mask_img=cv2.imread('./resized_segmentation_img.png',cv2.IMREAD_GRAYSCALE)
     mask_img=cv2.resize(mask_img,(768,1024))
     k = cv2.getStructuringElement(cv2.MORPH_RECT, (3,3))
     mask_img = cv2.erode(mask_img, k)
+    # 原图和主体图作差得到背景
     img_seg=cv2.bitwise_and(ori_img,ori_img,mask=mask_img)
     back_ground=ori_img-img_seg
     img_seg=np.where(img_seg==0,215,img_seg)
@@ -55,15 +58,18 @@ if __name__ == '__main__':
     cv2.imwrite('./HR-VITON-main/test/test/image/00001_00.jpg',img)
 
     # Generate grayscale semantic segmentation image
+    # 灰度图
     terminnal_command ="python get_seg_grayscale.py"
     os.system(terminnal_command)
 
     # Generate Densepose image using detectron2 library
+    # detectron2可以做多种识别
     print("\nGenerate Densepose image using detectron2 library\n")
     terminnal_command ="python detectron2/projects/DensePose/apply_net.py dump detectron2/projects/DensePose/configs/densepose_rcnn_R_50_FPN_s1x.yaml \
     https://dl.fbaipublicfiles.com/densepose/densepose_rcnn_R_50_FPN_s1x/165712039/model_final_162be9.pkl \
     origin.jpg --output output.pkl -v"
     os.system(terminnal_command)
+    # 人体躯干
     terminnal_command ="python get_densepose.py"
     os.system(terminnal_command)
 
