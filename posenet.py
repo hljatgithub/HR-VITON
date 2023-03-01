@@ -8,7 +8,9 @@ name="origin"
 testfile = "origin"+".jpg"
 testfile = input('模特图片路径：')
 print(testfile)
-net = load_model(101)
+
+# posenet/models/model_factory.py模型加载与调用模型、网络定义 posenet.models.mobilenet_v1 import MobileNetV1
+net = load_model(101) # 模型id与对应网络结构
 net = net.cuda()
 output_stride = net.output_stride
 scale_factor = 1.0
