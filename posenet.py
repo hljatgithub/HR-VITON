@@ -11,14 +11,15 @@ print(testfile)
 
 # posenet/models/model_factory.py模型加载与调用模型、网络定义 posenet.models.mobilenet_v1 import MobileNetV1
 net = load_model(101) # 模型id与对应网络结构
-net = net.cuda()
-output_stride = net.output_stride
+net = net.cuda() # Moves all model parameters and buffers to the GPU.
+output_stride = net.output_stride # 图片切割比例默认16~即1/16
 scale_factor = 1.0
 
+# 规范化图片比例
 input_image, draw_image, output_scale = posenet.read_imgfile(testfile, scale_factor=scale_factor, output_stride=output_stride)
 print(input_image.shape)
 with torch.no_grad():
-    input_image = torch.Tensor(input_image).cuda()
+    input_image = torch.Tensor(input_image).cuda() # 张量放到gpu上
 
     heatmaps_result, offsets_result, displacement_fwd_result, displacement_bwd_result = net(input_image)
 
@@ -35,7 +36,7 @@ poses = []
 # find face keypoints & detect face mask
 for pi in range(len(pose_scores)):
     if pose_scores[pi] != 0.:
-        #print('Pose #%d, score = %f' % (pi, pose_scores[pi]))       
+        #print('Pose #%d, score = %f' % (pi, pose_scores[pi]))
         keypoints = keypoint_coords.astype(np.int32) # convert float to integer
         #print(keypoints[pi])
         poses.append(keypoints[pi])
@@ -51,7 +52,7 @@ for ix in indices:
         openpose.append([int(pose[ix][1]),int(pose[ix][0]),1])        
     i+=1
 coords = []
-for x,y,z in openpose:
+for x,y,z in openpose: # nx3的列表变成一维列表
     coords.append(float(x))
     coords.append(float(y))
     coords.append(float(z))
