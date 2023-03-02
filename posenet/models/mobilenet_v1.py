@@ -130,6 +130,7 @@ MOBILE_NET_V1_50 = [
 class MobileNetV1(nn.Module):
 
     def __init__(self, model_id, output_stride=16):
+        # 自定义神经网络结果调用父类nn.module初始化，会自动识别nn的属性类Sequential,Conv2d加入模型
         super(MobileNetV1, self).__init__()
 
         assert model_id in MOBILENET_V1_CHECKPOINTS.keys()
@@ -148,14 +149,14 @@ class MobileNetV1(nn.Module):
             for c in conv_def]
         last_depth = conv_def[-1]['outp']
 
-        self.features = nn.Sequential(OrderedDict(conv_list))
+        self.features = nn.Sequential(OrderedDict(conv_list)) # MOBILENET_V1深度可分离卷积获取输入图片特征
         self.heatmap = nn.Conv2d(last_depth, 17, 1, 1)
         self.offset = nn.Conv2d(last_depth, 34, 1, 1)
         self.displacement_fwd = nn.Conv2d(last_depth, 32, 1, 1)
         self.displacement_bwd = nn.Conv2d(last_depth, 32, 1, 1)
 
-    def forward(self, x):
-        x = self.features(x)
+    def forward(self, x): # 父类初始化后直接传入数据x处理
+        x = self.features(x) # MOBILENET_V1深度可分离卷积获取输入图片特征
         heatmap = torch.sigmoid(self.heatmap(x))
         offset = self.offset(x)
         displacement_fwd = self.displacement_fwd(x)
