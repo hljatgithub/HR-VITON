@@ -35,7 +35,7 @@ def decode_pose(
         displacements_bwd
 ):
     num_parts = scores.shape[0]
-    num_edges = len(PARENT_CHILD_TUPLES)
+    num_edges = len(PARENT_CHILD_TUPLES) # posenet.constants.PARENT_CHILD_TUPLES 人体部位元组对(id,id)
 
     instance_keypoint_scores = np.zeros(num_parts)
     instance_keypoint_coords = np.zeros((num_parts, 2))
@@ -43,8 +43,8 @@ def decode_pose(
     instance_keypoint_coords[root_id] = root_image_coord
 
     for edge in reversed(range(num_edges)):
-        target_keypoint_id, source_keypoint_id = PARENT_CHILD_TUPLES[edge]
-        if (instance_keypoint_scores[source_keypoint_id] > 0.0 and
+        target_keypoint_id, source_keypoint_id = PARENT_CHILD_TUPLES[edge] # posenet.constants.PARENT_CHILD_TUPLES 人体部位元组对(id,id)
+        if (instance_keypoint_scores[source_keypoint_id] > 0.0 and # 下面开始看不懂
                 instance_keypoint_scores[target_keypoint_id] == 0.0):
             score, coords = traverse_to_targ_keypoint(
                 edge,
