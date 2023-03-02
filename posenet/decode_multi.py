@@ -26,12 +26,14 @@ def get_instance_score_fast(
 
 def build_part_with_score_torch(score_threshold, local_max_radius, scores):
     lmd = 2 * local_max_radius + 1
+    # lmd卷积核尺寸，stride步长，padding数据外圈填充0的圈数
+    # 步长3，输入-步长+1+padding*2刚好抵消，max_vals.shape==scores.shape
     max_vals = F.max_pool2d(scores, lmd, stride=1, padding=1)
     max_loc = (scores == max_vals) & (scores >= score_threshold)
-    max_loc_idx = max_loc.nonzero()
+    max_loc_idx = max_loc.nonzero()  # 张量非0值的坐标轴位置 4维
     scores_vec = scores[max_loc]
     sort_idx = torch.argsort(scores_vec, descending=True)
-    return scores_vec[sort_idx], max_loc_idx[sort_idx]
+    return scores_vec[sort_idx], max_loc_idx[sort_idx] # 1维序列+4元组列表
 
 
 # FIXME leaving here as reference for now
@@ -61,10 +63,14 @@ def build_part_with_score_torch(score_threshold, local_max_radius, scores):
 def decode_multiple_poses(
         scores, offsets, displacements_fwd, displacements_bwd, output_stride,
         max_pose_detections=10, score_threshold=0.5, nms_radius=20, min_pose_score=0.5):
-
+    # scores~heatmaps_result.squeeze(0), offsets_result.squeeze(0), displacement_fwd_result.squeeze(0),
+    # displacement_bwd_result.squeeze(0), output_stride=output_stride,
+    # max_pose_detections=20, min_pose_score=0.1
     # perform part scoring step on GPU as it's expensive
     # TODO determine how much more of this would be worth performing on the GPU
-    part_scores, part_idx = build_part_with_score_torch(score_threshold, LOCAL_MAXIMUM_RADIUS, scores)
+    
+    # part_scores卷积特征最大值, part_idx最大值的坐标轴位置
+    part_scores, part_idx = build_part_with_score_torch(score_threshold, LOCAL_MAXIMUM_RADIUS, scores) # posenet.constants.LOCAL_MAXIMUM_RADIUS = 1
     part_scores = part_scores.cpu().numpy()
     part_idx = part_idx.cpu().numpy()
 
@@ -82,10 +88,10 @@ def decode_multiple_poses(
     pose_keypoint_scores = np.zeros((max_pose_detections, NUM_KEYPOINTS))
     pose_keypoint_coords = np.zeros((max_pose_detections, NUM_KEYPOINTS, 2))
 
-    for root_score, (root_id, root_coord_y, root_coord_x) in zip(part_scores, part_idx):
+    for root_score, (root_id, root_coord_y, root_coord_x) in zip(part_scores, part_idx): # 遍历最大特征值和位置
         root_coord = np.array([root_coord_y, root_coord_x])
         root_image_coords = root_coord * output_stride + offsets[root_id, root_coord_y, root_coord_x]
-
+        # 下面开始看不懂，可能在匹配关键点
         if within_nms_radius_fast(
                 pose_keypoint_coords[:pose_count, root_id, :], squared_nms_radius, root_image_coords):
             continue
