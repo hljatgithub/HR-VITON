@@ -183,7 +183,7 @@ if __name__ == '__main__':
     parser.add_argument('--output_name', default='', type=str)
     parser.add_argument('--use_gpu', default=1, type=int)
     opts = parser.parse_args()
-
+    # deeplab_xception_transfer_projection_synBN_savemem分布式跨卡训练，对应SynchronizedBatchNorm2d
     net = deeplab_xception_transfer.deeplab_xception_transfer_projection_savemem(n_classes=20,
                                                                                  hidden_layers=128,
                                                                                  source_classes=7, )
