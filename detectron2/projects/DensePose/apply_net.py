@@ -333,12 +333,13 @@ class ShowAction(InferenceAction):
 
 
 def create_argument_parser() -> argparse.ArgumentParser:
+    # 创建解析器
     parser = argparse.ArgumentParser(
-        description=DOC,
-        formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=120),
+        description=DOC, # 函数描述
+        formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=120), # 默认的help信息
     )
     parser.set_defaults(func=lambda _: parser.print_help(sys.stdout))
-    subparsers = parser.add_subparsers(title="Actions")
+    subparsers = parser.add_subparsers(title="Actions") # 添加子命令
     for _, action in _ACTION_REGISTRY.items():
         action.add_parser(subparsers)
     return parser
@@ -346,7 +347,7 @@ def create_argument_parser() -> argparse.ArgumentParser:
 
 def main():
     parser = create_argument_parser()
-    args = parser.parse_args()
+    args = parser.parse_args() # 解析参数
     verbosity = args.verbosity if hasattr(args, "verbosity") else None
     global logger
     logger = setup_logger(name=LOGGER_NAME)
