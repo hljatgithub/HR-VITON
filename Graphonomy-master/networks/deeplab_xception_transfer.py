@@ -957,6 +957,7 @@ class deeplab_xception_transfer_projection_synBN_savemem(deeplab_xception_transf
         return torch.matmul(sim, source)
 
     def load_source_model(self,state_dict):
+        # state_dict 预训练的模型的参数
         own_state = self.state_dict()
         # for name inshop_cos own_state:
         #    print name
@@ -969,8 +970,8 @@ class deeplab_xception_transfer_projection_synBN_savemem(deeplab_xception_transf
                     name = name.replace('featuremap_2_graph','source_featuremap_2_graph')
                 else:
                     name = name.replace('graph','source_graph')
-            new_state_dict[name] = 0
-            if name not in own_state:
+            new_state_dict[name] = 0 # 记录预训练的参数
+            if name not in own_state: # 自定义参数少了
                 if 'num_batch' in name:
                     continue
                 print('unexpected key "{}" in state_dict'
@@ -980,6 +981,7 @@ class deeplab_xception_transfer_projection_synBN_savemem(deeplab_xception_transf
             if isinstance(param, Parameter):
                 # backwards compatibility for serialized parameters
                 param = param.data
+            # 预训练模型参数拷贝进自定义
             try:
                 own_state[name].copy_(param)
             except:
@@ -989,7 +991,8 @@ class deeplab_xception_transfer_projection_synBN_savemem(deeplab_xception_transf
                 continue  # i add inshop_cos 2018/02/01
             own_state[name].copy_(param)
             # print 'copying %s' %name
-
+        
+        # 检测自定义的多出来的参数
         missing = set(own_state.keys()) - set(new_state_dict.keys())
         if len(missing) > 0:
             print('missing keys in state_dict: "{}"'.format(missing))
