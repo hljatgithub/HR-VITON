@@ -32,7 +32,7 @@ if __name__ == '__main__':
     cv2.imwrite('resized_img.jpg',img)
 
     # Get openpose coordinate using posenet
-    # 生成关键点数据00001_00_keypoints.json给Graphonomy部位识别
+    # 生成关键点数据00001_00_keypoints.json
     print("Get openpose coordinate using posenet\n")
     terminnal_command = "python posenet.py" 
     os.system(terminnal_command)
@@ -49,12 +49,14 @@ if __name__ == '__main__':
     # 读取上面输出的主体图
     mask_img=cv2.imread('./resized_segmentation_img.png',cv2.IMREAD_GRAYSCALE)
     mask_img=cv2.resize(mask_img,(768,1024))
+    # 形态学转换~腐蚀erode，k为MORPH_RECT正方形核——白色区域变细
     k = cv2.getStructuringElement(cv2.MORPH_RECT, (3,3))
     mask_img = cv2.erode(mask_img, k)
-    # 原图和主体图作差得到背景
+    # 原图与主体图and部分保留得到原图主体
     img_seg=cv2.bitwise_and(ori_img,ori_img,mask=mask_img)
+    # 原图和主体图作差得到背景
     back_ground=ori_img-img_seg
-    img_seg=np.where(img_seg==0,215,img_seg)
+    img_seg=np.where(img_seg==0,215,img_seg) # 灰色背景
     # 原图无背景图
     cv2.imwrite("./seg_img.png",img_seg)
     img=cv2.resize(img_seg,(768,1024))
