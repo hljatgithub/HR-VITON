@@ -489,7 +489,7 @@ def main():
     train(opt, train_loader, val_loader, test_loader, board, tocg, D)
 
     # Save Checkpoint
-    save_checkpoint(tocg, os.path.join(opt.checkpoint_dir, opt.name, 'tocg_final.pth'),opt)
+    save_checkpoint(tocg, os.path.join(opt.checkpoint_dir, opt.name, 'mtviton.pth'),opt)
     save_checkpoint(D, os.path.join(opt.checkpoint_dir, opt.name, 'D_final.pth'),opt)
     print("Finished training %s!" % opt.name)
 
