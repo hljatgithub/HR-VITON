@@ -89,20 +89,20 @@ if __name__ == '__main__':
 
     # Add Background or Not
     l=glob.glob("./Output/*.png")
-
+    print(l)
     # Add Background
     if opt.background:
         for i in l:
             img=cv2.imread(i)
-            img=cv2.bitwise_and(img,img,mask=mask_img)
-            img=img+back_ground
             cv2.imwrite(i,img)
 
     # Remove Background
     else:
         for i in l:
             img=cv2.imread(i)
+            img=cv2.bitwise_and(img,img,mask=mask_img)
             cv2.imwrite(i,img)
+
 
     os.chdir("../")
     cv2.imwrite("./static/finalimg.png", img)
