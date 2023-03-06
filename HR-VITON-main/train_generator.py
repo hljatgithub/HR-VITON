@@ -659,7 +659,7 @@ def main():
     train(opt, train_loader, test_loader, test_vis_loader, board, tocg, generator, discriminator, model)
 
     # Save Checkpoint
-    save_checkpoint(generator, os.path.join(opt.checkpoint_dir, opt.name, 'gen_model_final.pth'),opt)
+    save_checkpoint(generator, os.path.join(opt.checkpoint_dir, opt.name, 'gen.pth'),opt)
     save_checkpoint(discriminator, os.path.join(opt.checkpoint_dir, opt.name, 'dis_model_final.pth'),opt)
 
     print("Finished training %s!" % opt.name)
