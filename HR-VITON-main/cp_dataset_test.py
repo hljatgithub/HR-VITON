@@ -254,9 +254,9 @@ class CPDatasetTest(data.Dataset):
         agnostic = self.transform(agnostic)
         
         parse_name = im_name.replace('.jpg', '.png')
-        parse = Image.open(osp.join(self.data_path, 'image-parse-v3', parse_name))
+        parse = Image.open(osp.join(self.data_path, 'image-parse-v3', parse_name)) # 原读取image-parse-agnostic-v3.2
         parse = transforms.Resize(self.fine_width, interpolation=0)(parse)
-        parse_agnostic = self.get_parse_agnostic(parse, pose_data)
+        parse_agnostic = self.get_parse_agnostic(parse, pose_data) # 这步跟源代码不一样，这版结合pose_data临时画图
         np.set_printoptions(threshold=np.inf, linewidth=np.inf) 
         #print(parse,parse_name)
         parse_agnostic = torch.from_numpy(np.array(parse_agnostic)[None]).long()
