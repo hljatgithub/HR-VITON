@@ -141,7 +141,7 @@ def train(opt, train_loader, test_loader, val_loader, board, tocg, D):
         # input2
         parse_agnostic = inputs['parse_agnostic'].cuda()
         densepose = inputs['densepose'].cuda()
-        openpose = inputs['pose'].cuda()
+        # openpose = inputs['pose'].cuda()
         # GT
         label_onehot = inputs['parse_onehot'].cuda()  # CE
         label = inputs['parse'].cuda()  # GAN loss
@@ -325,7 +325,7 @@ def train(opt, train_loader, test_loader, val_loader, board, tocg, D):
                     # input2
                     parse_agnostic = inputs['parse_agnostic'].cuda()
                     densepose = inputs['densepose'].cuda()
-                    openpose = inputs['pose'].cuda()
+                    # openpose = inputs['pose'].cuda()
                     # GT
                     label_onehot = inputs['parse_onehot'].cuda()  # CE
                     label = inputs['parse'].cuda()  # GAN loss
@@ -389,7 +389,7 @@ def train(opt, train_loader, test_loader, val_loader, board, tocg, D):
                 # input2
                 parse_agnostic = inputs['parse_agnostic'].cuda()
                 densepose = inputs['densepose'].cuda()
-                openpose = inputs['pose'].cuda()
+                # openpose = inputs['pose'].cuda()
                 # GT
                 label_onehot = inputs['parse_onehot'].cuda()  # CE
                 label = inputs['parse'].cuda()  # GAN loss
