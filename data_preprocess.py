@@ -16,7 +16,7 @@ def get_parse_agnostic(image_name, file_path): # 画image-parse-agnostic-v3.2
         pose_data = np.array(pose_data)
         pose_data = pose_data.reshape((-1, 3))[:, :2]
 
-    parse = Image.open(file_path+f'/image-parse-v3/{image_name}.png') # PIL.Image 原读取image-parse-agnostic-v3.2
+    parse = Image.open(file_path+f'/image-parse-v3/{image_name}_gray.png') # PIL.Image 原读取image-parse-agnostic-v3.2
     parse = transforms.Resize(fine_width, interpolation=0)(parse) # import torchvision.transforms as transforms
     
     #parse_agnostic = get_parse_agnostic(parse, pose_data) # 这步跟源代码不一样，这版结合pose_data临时画图
@@ -53,8 +53,8 @@ def get_parse_agnostic(image_name, file_path): # 画image-parse-agnostic-v3.2
     return agnostic
 
 
-#file_path = '/content/drive/MyDrive/AI/models/HR_VITOTN/data/train'
-file_path = '/content/HR-VITON/HR-VITON-main/data/train'
+#file_path = '/content/drive/MyDrive/AI/models/HR_VITOTN/data/total_data'
+file_path = '/content/HR-VITON/HR-VITON-main/data/total_data'
 
 
 os.chdir('/content/HR-VITON')
@@ -69,8 +69,8 @@ for i,file in enumerate(cloth_list):
     cloth_name = file.split('.')[0]
     # 1、检查分辨率············································
     print(cloth_path,'检查分辨率')
-    temp = cv2.cvtColor(cv2.imread(cloth_path), cv2.COLOR_BGR2RGB)
-    if temp.shape != (1024, 768, 3):
+    ori_cloth = cv2.cvtColor(cv2.imread(cloth_path), cv2.COLOR_BGR2RGB)
+    if ori_cloth.shape != (1024, 768, 3):
         cloth = cv2.imread(cloth_path)
         cloth = cv2.resize(cloth, (768, 1024))
         cv2.imwrite(cloth_path, cloth)
@@ -94,8 +94,8 @@ for i,file in enumerate(image_list):
     image_name = file.split('.')[0]
     # 1、检查分辨率·············································
     print(image_path,'检查分辨率')
-    temp = cv2.cvtColor(cv2.imread(image_path), cv2.COLOR_BGR2RGB)
-    if temp.shape != (1024, 768, 3):
+    ori_img = cv2.cvtColor(cv2.imread(image_path), cv2.COLOR_BGR2RGB)
+    if ori_img.shape != (1024, 768, 3):
         image = cv2.imread(image_path)
         image = cv2.resize(image, (768, 1024))
         cv2.imwrite(image_path, image)
@@ -116,12 +116,37 @@ for i,file in enumerate(image_list):
     cv2.imwrite('resized_img.jpg',img)
     os.chdir('/content/HR-VITON/Graphonomy-master')
     # 不包含文件类型结尾,程序内部固定.png
-    output_path = file_path + '/image-parse-v3'
-    print('生成肢体图image-densepose.png文件')
+    output_path = file_path + '/segmentation'
+    print('生成人体部位图segmentation：image_name.png~用于去除原图背景，image_name_gray.png~未知')
     # terminnal_command =f"python exp/inference/inference.py --loadmodel ./inference.pth --img_path ../resized_img.jpg --output_path ../image-parse-v3 --output_name /resized_segmentation_img"
     terminnal_command = f"python exp/inference/inference.py --loadmodel ./inference.pth --img_path ../resized_img.jpg --output_path {output_path} --output_name /{image_name}"
     os.system(terminnal_command)
 
+    # 读取上面输出的主体图
+    print('通过segmentation图生成无背景图')
+    mask_img=cv2.imread(output_path+f'/{image_name}.png',cv2.IMREAD_GRAYSCALE)
+    mask_img=cv2.resize(mask_img,(768,1024))
+    # 形态学转换~腐蚀erode，k为MORPH_RECT正方形核——有色区域变细，删掉更多背景
+    k = cv2.getStructuringElement(cv2.MORPH_RECT, (3,3))
+    mask_img = cv2.erode(mask_img, k)
+    # 原图与主体图and部分保留得到原图主体
+    img_seg=cv2.bitwise_and(ori_img, ori_img, mask=mask_img)
+    # 原图和主体图作差得到背景
+    back_ground=ori_img-img_seg
+    img_seg=np.where(img_seg==0,215,img_seg) # 灰色背景
+    # 原图无背景图
+    #cv2.imwrite("./seg_img.png",img_seg)
+    img=cv2.resize(img_seg,(768,1024))
+    output_path = file_path + '/image_no_background/{file}'
+    #cv2.imwrite('./HR-VITON-main/test/test/image/00001_00.jpg',img)
+    cv2.imwrite(output_path,img)
+  
+    print('segmentation图制作灰度图')
+    image_path = file_path + f'/segmentation/{image_name}.png'
+    output_path = file_path + f'/image-parse-v3/{image_name}.png'
+    terminnal_command = f"python get_seg_grayscale.py --image_path {image_path} --output_path {output_path}"
+    os.system(terminnal_command)
+    
     
     # 4、image-parse-agnostic-v3.2：image_name.png···············
     agnostic = get_parse_agnostic(image_name, file_path)
