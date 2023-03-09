@@ -8,6 +8,7 @@ from iglovikov_helper_functions.dl.pytorch.utils import tensor_from_rgb_image
 from cloths_segmentation.pre_trained_models import create_model
 import warnings
 warnings.filterwarnings("ignore")
+import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--cloth_path', type=str, default='', help='person image path')
