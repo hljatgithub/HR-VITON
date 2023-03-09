@@ -9,8 +9,15 @@ from cloths_segmentation.pre_trained_models import create_model
 import warnings
 warnings.filterwarnings("ignore")
 
-cloth_path = input('衣服图片路径：')
-
+parser = argparse.ArgumentParser()
+parser.add_argument('--cloth_path', type=str, default='', help='person image path')
+parser.add_argument('--output_path', type=str, default='', help='000001_0_keypoints output path')
+opt = parser.parse_args()
+#cloth_path = input('衣服图片路径：')
+cloth_path = opt.cloth_path
+output_path = opt.output_path
+    
+    
 model = create_model("Unet_2020-10-30")
 model.eval()
 image = load_rgb(cloth_path) # 长、宽、位深
@@ -44,5 +51,7 @@ img[int((1024-shape[0])/2): 1024-int((1024-shape[0])/2),int((768-shape[1])/2):76
 seg_img[int((1024-shape[0])/2): 1024-int((1024-shape[0])/2),int((768-shape[1])/2):768-int((768-shape[1])/2)]=b_img # 黑画布放mask白图
 
 
-cv2.imwrite("./HR-VITON-main/test/test/cloth/00001_00.jpg",img)
-cv2.imwrite("./HR-VITON-main/test/test/cloth-mask/00001_00.jpg",seg_img)
+cv2.imwrite(output_path.replace('cloth-mask', 'cloth'), img)
+#cv2.imwrite("./HR-VITON-main/test/test/cloth-mask/00001_00.jpg",seg_img)
+cv2.imwrite(output_path, seg_img)
+
