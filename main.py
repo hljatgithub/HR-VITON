@@ -32,9 +32,9 @@ if __name__ == '__main__':
     cv2.imwrite('resized_img.jpg',img)
 
     # Get openpose coordinate using posenet
-    # 生成关键点数据00001_00_keypoints.json
+    # 生成关键点数据00001_00_keypoints.json，修改了输入参数
     print("3、posenet生成keypoints数据················\n")
-    terminnal_command = "python posenet.py" 
+    terminnal_command = "python posenet.py --image_path original_path --output_path ./HR-VITON-main/test/test/openpose_json/00001_00_keypoints.json" 
     os.system(terminnal_command)
 
     # Generate semantic segmentation using Graphonomy-Master library
@@ -77,8 +77,8 @@ if __name__ == '__main__':
     https://dl.fbaipublicfiles.com/densepose/densepose_rcnn_R_50_FPN_s1x/165712039/model_final_162be9.pkl \
     origin.jpg --output output.pkl -v"
     os.system(terminnal_command)
-    # 通过data.json姿态关键点数据保留人体躯干部分
-    terminnal_command ="python get_densepose.py"
+    # 通过data.json姿态关键点数据保留人体躯干部分，修改了输入参数
+    terminnal_command ="python get_densepose.py --image_path original_path --output_path ./HR-VITON-main/test/test/image-densepose/00001_00.jpg"
     os.system(terminnal_command)
 
     # Run HR-VITON to generate final image
