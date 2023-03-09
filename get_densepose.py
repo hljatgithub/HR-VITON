@@ -3,6 +3,7 @@ from PIL import Image
 import pickle
 import json
 import numpy as np
+import argparse
 
 colormap = {
     2 : [20, 80, 194],
@@ -24,7 +25,7 @@ colormap = {
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--image_path', type=str, default='', help='person image path')
-parser.add_argument('--output_path', type=str, default='', help='000001_0_keypoints output path')
+parser.add_argument('--output_path', type=str, default='', help='00001_00.jpg output path')
 opt = parser.parse_args()
 testfile = opt.image_path
 output_path = opt.output_path
