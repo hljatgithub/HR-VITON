@@ -22,7 +22,15 @@ colormap = {
     24 : [248, 251, 14],
 }
 
-img = Image.open('./origin.jpg')
+parser = argparse.ArgumentParser()
+parser.add_argument('--image_path', type=str, default='', help='person image path')
+parser.add_argument('--output_path', type=str, default='', help='000001_0_keypoints output path')
+opt = parser.parse_args()
+testfile = opt.image_path
+output_path = opt.output_path
+    
+#img = Image.open('./origin.jpg')
+img = Image.open(opt.image_path)
 img_w ,img_h = img.size
 with open('./data.json', 'r') as f:
     json_data = json.load(f)
@@ -44,4 +52,5 @@ x,y,w,h=[int(v) for v in box]
 bg=np.zeros((img_h,img_w,3))
 bg[y:y+h,x:x+w,:] = seg_img
 bg_img = Image.fromarray(np.uint8(bg),"RGB")
-bg_img.save("./HR-VITON-main/test/test/image-densepose/00001_00.jpg")
+#bg_img.save("./HR-VITON-main/test/test/image-densepose/00001_00.jpg")
+bg_img.save(opt.output_path)
