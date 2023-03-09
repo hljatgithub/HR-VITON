@@ -16,7 +16,7 @@ def get_parse_agnostic(image_name, file_path): # 画image-parse-agnostic-v3.2
         pose_data = np.array(pose_data)
         pose_data = pose_data.reshape((-1, 3))[:, :2]
 
-    parse = Image.open(file_path+f'/image-parse-v3/{image_name}_gray.png') # PIL.Image 原读取image-parse-agnostic-v3.2
+    parse = Image.open(file_path+f'/image-parse-v3/{image_name}.png') # PIL.Image 原读取image-parse-agnostic-v3.2
     parse = transforms.Resize(fine_width, interpolation=0)(parse) # import torchvision.transforms as transforms
     
     #parse_agnostic = get_parse_agnostic(parse, pose_data) # 这步跟源代码不一样，这版结合pose_data临时画图
