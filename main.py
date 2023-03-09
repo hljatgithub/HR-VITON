@@ -84,12 +84,14 @@ if __name__ == '__main__':
     # Run HR-VITON to generate final image
     print("8、最终通过HR-VITON处理输出结果························\n")
     os.chdir("./HR-VITON-main")
+    # data_list~每行是一对image cloth二元组对,空格隔开文件名
     terminnal_command = "python3 test_generator.py --cuda True --test_name test1 --tocg_checkpoint mtviton.pth --gpu_ids 0 --gen_checkpoint gen.pth --datasetting unpaired --data_list t2.txt --dataroot ./test" 
     os.system(terminnal_command)
 
     # Add Background or Not
-    l=glob.glob("./Output/*.png")
+    l=glob.glob("./Output/*.png") # 00001_00_00001_00.png
     print(l)
+    # 批量导出——上面代码输出命名需改代码，data_list文件写入代码缺失
     # Add Background
     if opt.background:
         for i in l:
