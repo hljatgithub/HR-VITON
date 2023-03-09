@@ -17,7 +17,8 @@ if __name__ == '__main__':
     # Get mask of cloth
     # 衣服原图和黑白蒙版图另存为
     print("1、获取服装mask图···············\n")
-    terminnal_command = "python get_cloth_mask.py" 
+    cloth_path = input('1、衣服图片路径：')
+    terminnal_command = f"python get_cloth_mask.py --cloth_path {cloth_path} --output_path ./HR-VITON-main/test/test/cloth-mask/00001_00.jpg" 
     os.system(terminnal_command)
     
     # Read input image # 模特原图
@@ -34,14 +35,14 @@ if __name__ == '__main__':
     # Get openpose coordinate using posenet
     # 生成关键点数据00001_00_keypoints.json，修改了输入参数
     print("3、posenet生成keypoints数据················\n")
-    terminnal_command = "python posenet.py --image_path original_path --output_path ./HR-VITON-main/test/test/openpose_json/00001_00_keypoints.json" 
+    terminnal_command = f"python posenet.py --image_path {original_path} --output_path ./HR-VITON-main/test/test/openpose_json/00001_00_keypoints.json" 
     os.system(terminnal_command)
 
     # Generate semantic segmentation using Graphonomy-Master library
     # 人物部位识别分割、主体识别输出resized_segmentation_img
     print("4、基于Graphonomy-Master的DeepLabv3+模型生成segmentation图···············\n")
     os.chdir("./Graphonomy-master")
-    terminnal_command ="python exp/inference/inference.py --loadmodel ./inference.pth --img_path ../resized_img.jpg --output_path ../ --output_name /resized_segmentation_img"
+    terminnal_command = "python exp/inference/inference.py --loadmodel ./inference.pth --img_path ../resized_img.jpg --output_path ../ --output_name /resized_segmentation_img"
     os.system(terminnal_command)
     os.chdir("../")
 
@@ -78,7 +79,7 @@ if __name__ == '__main__':
     origin.jpg --output output.pkl -v"
     os.system(terminnal_command)
     # 通过data.json姿态关键点数据保留人体躯干部分，修改了输入参数
-    terminnal_command ="python get_densepose.py --image_path original_path --output_path ./HR-VITON-main/test/test/image-densepose/00001_00.jpg"
+    terminnal_command = f"python get_densepose.py --image_path {original_path} --output_path ./HR-VITON-main/test/test/image-densepose/00001_00.jpg"
     os.system(terminnal_command)
 
     # Run HR-VITON to generate final image
