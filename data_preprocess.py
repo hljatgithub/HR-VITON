@@ -56,6 +56,8 @@ def get_parse_agnostic(image_name, file_path): # 画image-parse-agnostic-v3.2
 #file_path = '/content/drive/MyDrive/AI/models/HR_VITOTN/data/train'
 file_path = '/content/HR-VITON/HR-VITON-main/data/train'
 
+
+os.chdir('/content/HR-VITON')
 # 衣服图片处理···············································································
 cloth_file_path = file_path + r'/cloth'
 cloth_list = os.listdir(cloth_file_path)
@@ -68,14 +70,13 @@ for i,file in enumerate(cloth_list):
     # 1、检查分辨率············································
     print(cloth_path,'检查分辨率')
     temp = cv2.cvtColor(cv2.imread(cloth_path), cv2.COLOR_BGR2RGB)
-    if temp.shape != (768, 1024):
+    if temp.shape != (1024, 768, 3):
         cloth = cv2.imread(cloth_path)
         cloth = cv2.resize(cloth, (768, 1024))
         cv2.imwrite(cloth_path, cloth)
         print('已重置图片大小')
 
     # 2、输出衣服mask·············································
-    %cd /content/HR-VITON/
     output_path = file_path + f'/cloth-mask/{cloth_name}.jpg'
     print('生成衣服mask', output_path)
     terminnal_command = f"python get_cloth_mask.py --cloth_path {cloth_path} --output_path {output_path}" 
@@ -94,45 +95,43 @@ for i,file in enumerate(image_list):
     # 1、检查分辨率·············································
     print(image_path,'检查分辨率')
     temp = cv2.cvtColor(cv2.imread(image_path), cv2.COLOR_BGR2RGB)
-    if temp.shape != (768, 1024):
+    if temp.shape != (1024, 768, 3):
         image = cv2.imread(image_path)
         image = cv2.resize(image, (768, 1024))
         cv2.imwrite(image_path, image)
         print('已重置图片大小')
 
 
-    print('\n')
     # 2、openpose_json：image_name_keypoints.json················
-    %cd /content/HR-VITON/
     # 包含文件类型结尾_keypoints.json
     output_path = file_path + f'/openpose_json/{image_name}_keypoints.json'
     print('生成keypoint.json', output_path)
     terminnal_command = f"python posenet.py --image_path {image_path} --output_path {output_path}" 
     os.system(terminnal_command)
 
-
-    print('\n')
+    
     # 3、image-parse-v3：image_name.png·······················
-    %cd /content/HR-VITON/Graphonomy-master
+    img=cv2.imread(image_path)
+    img=cv2.resize(img,(384,512))
+    cv2.imwrite('resized_img.jpg',img)
+    os.chdir('/content/HR-VITON/Graphonomy-master')
     # 不包含文件类型结尾,程序内部固定.png
     output_path = file_path + '/image-parse-v3'
     print('生成肢体图image-densepose.png文件')
-    # terminnal_command =f"python exp/inference/inference.py --loadmodel ./inference.pth --img_path /content/HR-VITON/HR-VITON-main/images/offline_p5.jpg --output_path ../image-parse-v3 --output_name /resized_segmentation_img"
-    terminnal_command = f"python exp/inference/inference.py --loadmodel ./inference.pth --img_path {image_path} --output_path output_path --output_name /{image_name}"
+    # terminnal_command =f"python exp/inference/inference.py --loadmodel ./inference.pth --img_path ../resized_img.jpg --output_path ../image-parse-v3 --output_name /resized_segmentation_img"
+    terminnal_command = f"python exp/inference/inference.py --loadmodel ./inference.pth --img_path ../resized_img.jpg --output_path {output_path} --output_name /{image_name}"
     os.system(terminnal_command)
-    %cd ../
 
-
-    print('\n')
+    
     # 4、image-parse-agnostic-v3.2：image_name.png···············
     agnostic = get_parse_agnostic(image_name, file_path)
     output_path = file_path + '/image-parse-agnostic-v3.2'
     cv2.imwrite(output_path, agnostic)
 
 
-    print('\n')
     # 5、姿态估计image-densepose：image_name.jpg
-    %cd /content/HR-VITON
+    #%cd /content/HR-VITON
+    os.chdir('/content/HR-VITON')
     #terminnal_command ="python detectron2/projects/DensePose/apply_net.py dump detectron2/projects/DensePose/configs/densepose_rcnn_R_50_FPN_s1x.yaml \
     #https://dl.fbaipublicfiles.com/densepose/densepose_rcnn_R_50_FPN_s1x/165712039/model_final_162be9.pkl \
     #origin.jpg --output output.pkl -v"
@@ -146,4 +145,5 @@ for i,file in enumerate(image_list):
     output_path = file_path + '/image-densepose'
     terminnal_command = f"python get_densepose.py --image_path {image_path} --output_path {output_path}"
     os.system(terminnal_command)
-    %cd ../
+
+    print('\n')
