@@ -3,8 +3,14 @@ from PIL import Image
 import pickle
 import json
 import numpy as np
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument('--image_path', type=str, default='', help='person resized_segmentation_img path')
+parser.add_argument('--output_path', type=str, default='', help='image-parse-v3/00001_00.png output path')
+opt = parser.parse_args()
 
-img = Image.open('./resized_segmentation_img.png')
+#img = Image.open('./resized_segmentation_img.png')
+img = Image.open(opt.image_path)
 img_w ,img_h = img.size
 
 img = np.array(img)
@@ -44,4 +50,5 @@ for y_idx in range(img.shape[0]):
             
 img=cv2.resize(gray_img,(768,1024),interpolation=cv2.INTER_NEAREST)
 bg_img = Image.fromarray(np.uint8(img),"L")
-bg_img.save("./HR-VITON-main/test/test/image-parse-v3/00001_00.png")
+#bg_img.save("./HR-VITON-main/test/test/image-parse-v3/00001_00.png")
+bg_img.save(opt.output_path)
