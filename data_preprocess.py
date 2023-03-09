@@ -53,10 +53,10 @@ def get_parse_agnostic(image_name, file_path): # 画image-parse-agnostic-v3.2
     return agnostic
 
 
-#file_path = '/content/drive/MyDrive/AI/models/HR_VITOTN/data/total_data'
-file_path = '/content/HR-VITON/HR-VITON-main/data/total_data'
+file_path = '/content/drive/MyDrive/AI/models/HR_VITOTN/data/total_data'
+#file_path = '/content/HR-VITON/HR-VITON-main/data/total_data'
 
-
+print('衣服图片处理·····················································')
 os.chdir('/content/HR-VITON')
 # 衣服图片处理···············································································
 cloth_file_path = file_path + r'/cloth'
@@ -69,8 +69,8 @@ for i,file in enumerate(cloth_list):
     cloth_name = file.split('.')[0]
     # 1、检查分辨率············································
     print(cloth_path,'检查分辨率')
-    ori_cloth = cv2.cvtColor(cv2.imread(cloth_path), cv2.COLOR_BGR2RGB)
-    if ori_cloth.shape != (1024, 768, 3):
+    temp = cv2.cvtColor(cv2.imread(cloth_path), cv2.COLOR_BGR2RGB)
+    if temp.shape != (1024, 768, 3):
         cloth = cv2.imread(cloth_path)
         cloth = cv2.resize(cloth, (768, 1024))
         cv2.imwrite(cloth_path, cloth)
@@ -83,6 +83,7 @@ for i,file in enumerate(cloth_list):
     os.system(terminnal_command)
 
 
+print('\n人物图片处理·····················································')
 # 人物图片处理···············································································
 image_file_path = file_path + r'/image'
 image_list = os.listdir(image_file_path)
@@ -94,8 +95,8 @@ for i,file in enumerate(image_list):
     image_name = file.split('.')[0]
     # 1、检查分辨率·············································
     print(image_path,'检查分辨率')
-    ori_img = cv2.cvtColor(cv2.imread(image_path), cv2.COLOR_BGR2RGB)
-    if ori_img.shape != (1024, 768, 3):
+    temp = cv2.cvtColor(cv2.imread(image_path), cv2.COLOR_BGR2RGB)
+    if temp.shape != (1024, 768, 3):
         image = cv2.imread(image_path)
         image = cv2.resize(image, (768, 1024))
         cv2.imwrite(image_path, image)
@@ -105,11 +106,11 @@ for i,file in enumerate(image_list):
     # 2、openpose_json：image_name_keypoints.json················
     # 包含文件类型结尾_keypoints.json
     output_path = file_path + f'/openpose_json/{image_name}_keypoints.json'
-    print('生成keypoint.json', output_path)
+    print('\n生成keypoint.json', output_path)
     terminnal_command = f"python posenet.py --image_path {image_path} --output_path {output_path}" 
     os.system(terminnal_command)
 
-    
+
     # 3、image-parse-v3：image_name.png·······················
     img=cv2.imread(image_path)
     img=cv2.resize(img,(384,512))
@@ -117,19 +118,21 @@ for i,file in enumerate(image_list):
     os.chdir('/content/HR-VITON/Graphonomy-master')
     # 不包含文件类型结尾,程序内部固定.png
     output_path = file_path + '/segmentation'
-    print('生成人体部位图segmentation：image_name.png~用于去除原图背景，image_name_gray.png~未知')
+    print('\n生成人体部位图segmentation：image_name.png~用于去除原图背景，image_name_gray.png~未知')
     # terminnal_command =f"python exp/inference/inference.py --loadmodel ./inference.pth --img_path ../resized_img.jpg --output_path ../image-parse-v3 --output_name /resized_segmentation_img"
     terminnal_command = f"python exp/inference/inference.py --loadmodel ./inference.pth --img_path ../resized_img.jpg --output_path {output_path} --output_name /{image_name}"
     os.system(terminnal_command)
 
+
     # 读取上面输出的主体图
-    print('通过segmentation图生成无背景图')
+    print('\n通过segmentation图生成无背景图')
     mask_img=cv2.imread(output_path+f'/{image_name}.png',cv2.IMREAD_GRAYSCALE)
     mask_img=cv2.resize(mask_img,(768,1024))
     # 形态学转换~腐蚀erode，k为MORPH_RECT正方形核——有色区域变细，删掉更多背景
     k = cv2.getStructuringElement(cv2.MORPH_RECT, (3,3))
     mask_img = cv2.erode(mask_img, k)
     # 原图与主体图and部分保留得到原图主体
+    ori_img = cv2.imread(image_path)
     img_seg=cv2.bitwise_and(ori_img, ori_img, mask=mask_img)
     # 原图和主体图作差得到背景
     back_ground=ori_img-img_seg
@@ -137,18 +140,18 @@ for i,file in enumerate(image_list):
     # 原图无背景图
     #cv2.imwrite("./seg_img.png",img_seg)
     img=cv2.resize(img_seg,(768,1024))
-    output_path = file_path + '/image_no_background/{file}'
+    output_path = file_path + f'/image_no_background/{file}'
     #cv2.imwrite('./HR-VITON-main/test/test/image/00001_00.jpg',img)
     cv2.imwrite(output_path,img)
   
-    print('segmentation图制作灰度图')
+    print('\nsegmentation图制作灰度图') # 似乎重复
     image_path = file_path + f'/segmentation/{image_name}.png'
     output_path = file_path + f'/image-parse-v3/{image_name}.png'
     terminnal_command = f"python get_seg_grayscale.py --image_path {image_path} --output_path {output_path}"
     os.system(terminnal_command)
     
     
-    # 4、image-parse-agnostic-v3.2：image_name.png···············
+    # 4、image-parse-agnostic-v3.2：image_name.png···············# 似乎重复
     agnostic = get_parse_agnostic(image_name, file_path)
     output_path = file_path + '/image-parse-agnostic-v3.2'
     cv2.imwrite(output_path, agnostic)
