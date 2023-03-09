@@ -31,7 +31,7 @@ x = transform(image=padded_image)["image"]
 x = torch.unsqueeze(tensor_from_rgb_image(x), 0)
 
 with torch.no_grad():
-  prediction = model(x)[0][0]
+    prediction = model(x)[0][0]
 
 mask = (prediction > 0).cpu().numpy().astype(np.uint8)
 mask = unpad(mask, pads) # 删除填充的外圈
@@ -45,6 +45,7 @@ b_img = mask* 255 # 全白
 if b.shape[1]<=600 and b.shape[0]<=500:
     b=cv2.resize(b,(int(b.shape[1]*1.2),int(b.shape[0]*1.2)))
     b_img=cv2.resize(b_img,(int(b_img.shape[1]*1.2),int(b_img.shape[0]*1.2)))
+    
 shape=b_img.shape
 # 下面应该在统一大小
 img[int((1024-shape[0])/2): 1024-int((1024-shape[0])/2),int((768-shape[1])/2):768-int((768-shape[1])/2)]=b # img白画布上放原图
