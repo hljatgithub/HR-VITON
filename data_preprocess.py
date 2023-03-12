@@ -117,7 +117,8 @@ for i,file in enumerate(image_list):
     cv2.imwrite('resized_img.jpg',img)
     os.chdir('/content/HR-VITON/Graphonomy-master')
     # 不包含文件类型结尾,程序内部固定.png
-    output_path = file_path + '/segmentation'
+    #output_path = file_path + '/segmentation'
+    output_path = file_path + '/image-parse-v3'
     print('\n生成人体部位图segmentation') #image_name.png~用于去除原图背景，image_name_gray.png~测试作为image-parse-agnostic-v3.2
     # terminnal_command = "python exp/inference/inference.py --loadmodel ./inference.pth --img_path ../resized_img.jpg --output_path ../ --output_name /resized_segmentation_img"
     terminnal_command = f"python exp/inference/inference.py --loadmodel ./inference.pth --img_path ../resized_img.jpg --output_path {output_path} --output_name /{image_name}"
@@ -145,9 +146,9 @@ for i,file in enumerate(image_list):
     cv2.imwrite(output_path,img)
   
     #print('\nsegmentation图制作灰度图') # 与inference顺带生成的灰度图重复，大小不一致
-    #image_path = file_path + f'/segmentation/{image_name}.png'
+    #input_path = file_path + f'/segmentation/{image_name}.png'
     #output_path = file_path + f'/image-parse-v3/{image_name}.png'
-    #terminnal_command = f"python get_seg_grayscale.py --image_path {image_path} --output_path {output_path}"
+    #terminnal_command = f"python get_seg_grayscale.py --image_path {input_path} --output_path {output_path}"
     #os.system(terminnal_command)
     
     
@@ -167,11 +168,11 @@ for i,file in enumerate(image_list):
     # 输出data.json到/content/HR-VITON
     terminnal_command = f"python detectron2/projects/DensePose/apply_net.py dump detectron2/projects/DensePose/configs/densepose_rcnn_R_50_FPN_s1x.yaml \
     https://dl.fbaipublicfiles.com/densepose/densepose_rcnn_R_50_FPN_s1x/165712039/model_final_162be9.pkl \
-    input {image_path} --output output.pkl -v"
+    {image_path} --output output.pkl -v"
     os.system(terminnal_command)
     
     # 通过data.json姿态关键点数据保留人体躯干部分image_name.jpg
-    output_path = file_path + '/image-densepose'
+    output_path = f'{file_path}/image-densepose/{image_name}.jpg'
     terminnal_command = f"python get_densepose.py --image_path {image_path} --output_path {output_path}"
     os.system(terminnal_command)
 
