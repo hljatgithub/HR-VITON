@@ -168,7 +168,9 @@ def inference(net, img_path='', output_path='./', output_name='f', use_gpu=True)
 
     parsing_im = Image.fromarray(vis_res[0])
     parsing_im.save(output_path+'/{}.png'.format(output_name))
-    cv2.imwrite(output_path+'/{}_gray.png'.format(output_name), results[0, :, :])
+    #cv2.imwrite(output_path+'/{}_gray.png'.format(output_name), results[0, :, :])
+    # 原代码该图似乎没用上
+    cv2.imwrite(output_path.replace('image-parse-v3', 'image-parse-agnostic-v3.2')+'/{}.png'.format(output_name), results[0, :, :])
 
     end_time = timeit.default_timer()
     print('time used for the multi-scale image inference' + ' is :' + str(end_time - start_time))
