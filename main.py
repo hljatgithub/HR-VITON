@@ -67,7 +67,7 @@ if __name__ == '__main__':
     # Generate grayscale semantic segmentation image
     # 用主题图resized_segmentation_img制作灰度图
     print('6、通过segmentation图生成灰度图························\n')
-    terminnal_command ="python get_seg_grayscale.py"
+    terminnal_command =f"python get_seg_grayscale.py --image_path ./resized_segmentation_img.png --output_path ./HR-VITON-main/test/test/image-parse-v3/00001_00.png""
     os.system(terminnal_command)
 
     # Generate Densepose image using detectron2 library
