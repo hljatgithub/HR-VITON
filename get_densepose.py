@@ -27,7 +27,6 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--image_path', type=str, default='', help='person image path')
 parser.add_argument('--output_path', type=str, default='', help='00001_00.jpg output path')
 opt = parser.parse_args()
-testfile = opt.image_path
 output_path = opt.output_path
     
 #img = Image.open('./origin.jpg')
@@ -54,4 +53,4 @@ bg=np.zeros((img_h,img_w,3))
 bg[y:y+h,x:x+w,:] = seg_img
 bg_img = Image.fromarray(np.uint8(bg),"RGB")
 #bg_img.save("./HR-VITON-main/test/test/image-densepose/00001_00.jpg")
-bg_img.save(opt.output_path)
+bg_img.save(output_path)
