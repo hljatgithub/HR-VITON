@@ -13,6 +13,7 @@ from tqdm import tqdm
 from tensorboardX import SummaryWriter
 from utils import *
 from torch.utils.data import Subset
+import numpy as np
 
 
 def iou_metric(y_pred_batch, y_true_batch):
