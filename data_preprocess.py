@@ -53,7 +53,7 @@ def get_parse_agnostic(image_name, file_path): # 画image-parse-agnostic-v3.2
     return agnostic
 
 
-file_path = '/content/drive/MyDrive/AI/models/HR_VITOTN/data/total_data'
+file_path = '/content/drive/MyDrive/AI/models/HR_VITOTN/data'
 #file_path = '/content/HR-VITON/HR-VITON-main/data/total_data'
 
 print('衣服图片处理·····················································')
