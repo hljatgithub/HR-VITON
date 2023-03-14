@@ -119,7 +119,7 @@ for i,file in enumerate(image_list):
     # 不包含文件类型结尾,程序内部固定.png
     output_path = file_path + '/segmentation'
     #output_path = file_path + '/image-parse-v3'
-    print('\n生成人体部位图segmentation') #image_name.png~用于去除原图背景，image_name_gray.png~测试作为image-parse-agnostic-v3.2
+    print('\n生成人体部位图segmentation') #image_name.png~用于去除原图背景，image_name_gray.png~灰度图制作索引图v3、v3.2
     # terminnal_command = "python exp/inference/inference.py --loadmodel ./inference.pth --img_path ../resized_img.jpg --output_path ../ --output_name /resized_segmentation_img"
     terminnal_command = f"python exp/inference/inference.py --loadmodel ./inference.pth --img_path ../resized_img.jpg --output_path {output_path} --output_name /{image_name}"
     os.system(terminnal_command)
@@ -152,10 +152,10 @@ for i,file in enumerate(image_list):
     #os.system(terminnal_command)
     
     
-    # 4、image-parse-agnostic-v3.2：image_name.png···············# 似乎重复
+    # 4、image-parse-agnostic-v3.2：image_name.png···············# 索引图v3盖住身体脖子手臂
     agnostic = get_parse_agnostic(image_name, file_path)
-    output_path = file_path + '/image-parse-agnostic-v3.2'
-    cv2.imwrite(output_path, agnostic)
+    output_path = file_path + f'/image-parse-agnostic-v3.2/{image_name}.png'
+    agnostic.save(output_path)
 
 
     # 5、姿态估计image-densepose：image_name.jpg
