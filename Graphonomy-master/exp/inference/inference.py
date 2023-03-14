@@ -167,11 +167,17 @@ def inference(net, img_path='', output_path='./', output_name='f', use_gpu=True)
     vis_res = decode_labels(results)
 
     parsing_im = Image.fromarray(vis_res[0])
+    # resized_segmentation_img，灰度图加上颜色，用于后续去除背景
     parsing_im.save(output_path+'/{}.png'.format(output_name))
     #cv2.imwrite(output_path+'/{}_gray.png'.format(output_name), results[0, :, :])
-    # 原代码该图似乎没用上
-    cv2.imwrite(output_path.replace('image-parse-v3', 'image-parse-agnostic-v3.2')+'/{}.png'.format(output_name), results[0, :, :])
-
+    # 灰度图，用于制作8位深索引彩图 image-parse-v3、image-parse-agnostic-v3.2 
+    #cv2.imwrite(output_path.replace('segmentation', 'image-parse-v3')+'/{}.png'.format(output_name),  results[0, :, :])
+    temp = results[0, :, :]
+    temp = cv2.resize(temp, (768, 1024), interpolation=cv2.INTER_NEAREST)
+    palette = np.array(label_colours).reshape(-1).tolist()
+    temp = img.putpalette(palette)
+    temp.save(output_path.replace('segmentation', 'image-parse-v3')+'/{}.png'.format(output_name))
+    
     end_time = timeit.default_timer()
     print('time used for the multi-scale image inference' + ' is :' + str(end_time - start_time))
 
