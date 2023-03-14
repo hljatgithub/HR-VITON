@@ -27,7 +27,7 @@ def get_parse_agnostic(image_name, file_path): # 画image-parse-agnostic-v3.2
                     (parse_array == 7).astype(np.float32))
     parse_neck = (parse_array == 10).astype(np.float32)
 
-    r = 10
+    r = 15 # 10
     agnostic = parse.copy()
 
     # mask arms
@@ -40,7 +40,7 @@ def get_parse_agnostic(image_name, file_path): # 画image-parse-agnostic-v3.2
                 continue
             mask_arm_draw.line([tuple(pose_data[j]) for j in [i_prev, i]], 'white', width=r*10)
             pointx, pointy = pose_data[i]
-            radius = r*4 if i == pose_ids[-1] else r*15
+            radius = r*5 if i == pose_ids[-1] else r*3 # 4,15
             mask_arm_draw.ellipse((pointx-radius, pointy-radius, pointx+radius, pointy+radius), 'white', 'white')
             i_prev = i
         parse_arm = (np.array(mask_arm) / 255) * (parse_array == parse_id).astype(np.float32)
@@ -117,8 +117,8 @@ for i,file in enumerate(image_list):
     cv2.imwrite('resized_img.jpg',img)
     os.chdir('/content/HR-VITON/Graphonomy-master')
     # 不包含文件类型结尾,程序内部固定.png
-    #output_path = file_path + '/segmentation'
-    output_path = file_path + '/image-parse-v3'
+    output_path = file_path + '/segmentation'
+    #output_path = file_path + '/image-parse-v3'
     print('\n生成人体部位图segmentation') #image_name.png~用于去除原图背景，image_name_gray.png~测试作为image-parse-agnostic-v3.2
     # terminnal_command = "python exp/inference/inference.py --loadmodel ./inference.pth --img_path ../resized_img.jpg --output_path ../ --output_name /resized_segmentation_img"
     terminnal_command = f"python exp/inference/inference.py --loadmodel ./inference.pth --img_path ../resized_img.jpg --output_path {output_path} --output_name /{image_name}"
@@ -153,9 +153,9 @@ for i,file in enumerate(image_list):
     
     
     # 4、image-parse-agnostic-v3.2：image_name.png···············# 似乎重复
-    #agnostic = get_parse_agnostic(image_name, file_path)
-    #output_path = file_path + '/image-parse-agnostic-v3.2'
-    #cv2.imwrite(output_path, agnostic)
+    agnostic = get_parse_agnostic(image_name, file_path)
+    output_path = file_path + '/image-parse-agnostic-v3.2'
+    cv2.imwrite(output_path, agnostic)
 
 
     # 5、姿态估计image-densepose：image_name.jpg
