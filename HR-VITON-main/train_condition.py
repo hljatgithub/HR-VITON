@@ -154,9 +154,9 @@ def train(opt, train_loader, test_loader, val_loader, board, tocg, D):
         # inputs
         input1 = torch.cat([c_paired, cm_paired], 1)
         input2 = torch.cat([parse_agnostic, densepose], 1)
-
+        
         # forward
-        flow_list, fake_segmap, warped_cloth_paired, warped_clothmask_paired = tocg(input1, input2)
+        flow_list, fake_segmap, warped_cloth_paired, warped_clothmask_paired = tocg(opt, input1, input2)
         
         # warped cloth mask one hot 
         
@@ -239,7 +239,7 @@ def train(opt, train_loader, test_loader, val_loader, board, tocg, D):
             for i in range(len(flow_list)-1):
                 flow = flow_list[i]
                 N, fH, fW, _ = flow.size()
-                grid = mkgrid(N, iH, iW)
+                grid = mkgrid(N, iH, iW, opt)
                 flow = F.interpolate(flow.permute(0, 3, 1, 2), size = c_paired.shape[2:], mode=opt.upsample).permute(0, 2, 3, 1)
                 flow_norm = torch.cat([flow[:, :, :, 0:1] / ((fW - 1.0) / 2.0), flow[:, :, :, 1:2] / ((fH - 1.0) / 2.0)], 3)
                 warped_c = F.grid_sample(c_paired, flow_norm + grid, padding_mode='border')
@@ -297,7 +297,7 @@ def train(opt, train_loader, test_loader, val_loader, board, tocg, D):
                 
                 # discriminator
                 with torch.no_grad():
-                    _, fake_segmap, _, _ = tocg(input1, input2)
+                    _, fake_segmap, _, _ = tocg(opt, input1, input2)
                 fake_segmap_softmax = torch.softmax(fake_segmap, 1)
                 
                 # loss discriminator
@@ -339,7 +339,7 @@ def train(opt, train_loader, test_loader, val_loader, board, tocg, D):
                     input2 = torch.cat([parse_agnostic, densepose], 1)
                     
                     # forward
-                    flow_list, fake_segmap, warped_cloth_paired, warped_clothmask_paired = tocg(input1, input2)
+                    flow_list, fake_segmap, warped_cloth_paired, warped_clothmask_paired = tocg(opt, input1, input2)
                 
                     # fake segmap cloth channel * warped clothmask
                     if opt.clothmask_composition != 'no_composition':
@@ -406,7 +406,7 @@ def train(opt, train_loader, test_loader, val_loader, board, tocg, D):
                     input2 = torch.cat([parse_agnostic, densepose], 1)
 
                     # forward
-                    flow_list, fake_segmap, warped_cloth_paired, warped_clothmask_paired = tocg(input1, input2)
+                    flow_list, fake_segmap, warped_cloth_paired, warped_clothmask_paired = tocg(opt, input1, input2)
                     
                     warped_cm_onehot = torch.FloatTensor((warped_clothmask_paired.detach().cpu().numpy() > 0.5).astype(np.float)).cuda()
                     if opt.clothmask_composition != 'no_composition':
@@ -468,9 +468,10 @@ def main():
         opt.data_list = opt.test_data_list
         test_dataset = CPDatasetTest(opt)
         opt.batch_size = train_bsize
-        val_dataset = Subset(test_dataset, np.arange(2000))
+        val_dataset = Subset(test_dataset, np.arange(1))
         test_loader = CPDataLoader(opt, test_dataset)
         val_loader = CPDataLoader(opt, val_dataset)
+        print(opt.dataroot, opt.datamode, opt.data_list, opt.batch_size)
     # visualization
     if not os.path.exists(opt.tensorboard_dir):
         os.makedirs(opt.tensorboard_dir)
