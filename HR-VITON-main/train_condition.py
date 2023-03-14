@@ -450,7 +450,7 @@ def train(opt, train_loader, test_loader, val_loader, board, tocg, D):
 
 def main():
     opt = get_opt()
-    print(opt)
+    #print(opt)
     print("Start to train %s!" % opt.name)
     os.environ["CUDA_VISIBLE_DEVICES"] = opt.gpu_ids
     
@@ -471,7 +471,7 @@ def main():
         val_dataset = Subset(test_dataset, np.arange(1))
         test_loader = CPDataLoader(opt, test_dataset)
         val_loader = CPDataLoader(opt, val_dataset)
-        print(opt.dataroot, opt.datamode, opt.data_list, opt.batch_size)
+        #print(opt.dataroot, opt.datamode, opt.data_list, opt.batch_size)
     # visualization
     if not os.path.exists(opt.tensorboard_dir):
         os.makedirs(opt.tensorboard_dir)
