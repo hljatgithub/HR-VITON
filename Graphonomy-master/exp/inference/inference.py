@@ -172,10 +172,11 @@ def inference(net, img_path='', output_path='./', output_name='f', use_gpu=True)
     #cv2.imwrite(output_path+'/{}_gray.png'.format(output_name), results[0, :, :])
     # 灰度图，用于制作8位深索引彩图 image-parse-v3、image-parse-agnostic-v3.2 
     #cv2.imwrite(output_path.replace('segmentation', 'image-parse-v3')+'/{}.png'.format(output_name),  results[0, :, :])
-    temp = results[0, :, :]
+    temp = results[0, :, :] # result已经是灰度图
     temp = cv2.resize(temp, (768, 1024), interpolation=cv2.INTER_NEAREST)
     palette = np.array(label_colours).reshape(-1).tolist()
-    temp = img.putpalette(palette)
+    temp = Image.fromarray(temp).convert('P') # 转化为索引图
+    temp.putpalette(palette) # 插入索引对应颜色，每三个数值一个颜色
     temp.save(output_path.replace('segmentation', 'image-parse-v3')+'/{}.png'.format(output_name))
     
     end_time = timeit.default_timer()
