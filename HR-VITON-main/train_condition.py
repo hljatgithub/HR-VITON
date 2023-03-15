@@ -49,7 +49,7 @@ def get_opt():
     parser.add_argument("--name", default="test")
     parser.add_argument("--gpu_ids", default="")
     parser.add_argument('-j', '--workers', type=int, default=4)
-    parser.add_argument('-b', '--batch-size', type=int, default=8)
+    parser.add_argument('-b', '--batch_size', type=int, default=8)
     parser.add_argument('--fp16', action='store_true', help='use amp')
 
     parser.add_argument("--dataroot", default="./data/")
@@ -450,7 +450,7 @@ def train(opt, train_loader, test_loader, val_loader, board, tocg, D):
 
 def main():
     opt = get_opt()
-    #print(opt)
+    print(opt)
     print("Start to train %s!" % opt.name)
     os.environ["CUDA_VISIBLE_DEVICES"] = opt.gpu_ids
     
