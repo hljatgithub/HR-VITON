@@ -62,13 +62,13 @@ def get_opt():
     parser.add_argument('--checkpoint_dir', type=str, default='checkpoints', help='save checkpoint infos')
     parser.add_argument('--tocg_checkpoint', type=str, default='', help='tocg checkpoint')
 
-    parser.add_argument("--tensorboard_count", type=int, default=100)
-    parser.add_argument("--display_count", type=int, default=100)
-    parser.add_argument("--save_count", type=int, default=10000)
+    parser.add_argument("--tensorboard_count", type=int, default=100) # 每x次计算一次损失
+    parser.add_argument("--display_count", type=int, default=100) # 打印损失
+    parser.add_argument("--save_count", type=int, default=10000) # 每x次保存模型
     parser.add_argument("--load_step", type=int, default=0)
-    parser.add_argument("--keep_step", type=int, default=300000)
+    parser.add_argument("--keep_step", type=int, default=300000) # 总迭代次数
     parser.add_argument("--shuffle", action='store_true', help='shuffle input data')
-    parser.add_argument("--semantic_nc", type=int, default=13)
+    parser.add_argument("--semantic_nc", type=int, default=13) # 部位图部位数
     parser.add_argument("--output_nc", type=int, default=13)
     
     # network
@@ -90,7 +90,7 @@ def get_opt():
     
     # test visualize
     parser.add_argument("--no_test_visualize", action='store_true')    
-    parser.add_argument("--num_test_visualize", type=int, default=3)
+    parser.add_argument("--num_test_visualize", type=int, default=3) # 测试集可视化数量，需小于batch
     parser.add_argument("--test_datasetting", default="unpaired")
     parser.add_argument("--test_dataroot", default="./data/")
     parser.add_argument("--test_data_list", default="test_pairs.txt")
@@ -316,7 +316,7 @@ def train(opt, train_loader, test_loader, val_loader, board, tocg, D):
             tocg.eval()
             iou_list = []
             with torch.no_grad():
-                for cnt in range(2000//opt.batch_size):
+                for cnt in range(opt.val_count//opt.batch_size): # 2000//opt.batch_size
                 
                     inputs = val_loader.next_batch()
                     # input1
@@ -468,7 +468,7 @@ def main():
         opt.data_list = opt.test_data_list
         test_dataset = CPDatasetTest(opt)
         opt.batch_size = train_bsize
-        val_dataset = Subset(test_dataset, np.arange(1))
+        val_dataset = Subset(test_dataset, np.arange(opt.val_count)) # np.arange(2000)
         test_loader = CPDataLoader(opt, test_dataset)
         val_loader = CPDataLoader(opt, val_dataset)
         #print(opt.dataroot, opt.datamode, opt.data_list, opt.batch_size)
