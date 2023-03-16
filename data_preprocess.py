@@ -167,8 +167,7 @@ for i,file in enumerate(image_list):
     #origin.jpg --output output.pkl -v"
     # 输出data.json到/content/HR-VITON
     terminnal_command = f"python detectron2/projects/DensePose/apply_net.py dump detectron2/projects/DensePose/configs/densepose_rcnn_R_50_FPN_s1x.yaml \
-    https://dl.fbaipublicfiles.com/densepose/densepose_rcnn_R_50_FPN_s1x/165712039/model_final_162be9.pkl \
-    {image_path} --output output.pkl -v"
+    model_final_162be9.pkl {image_path} --output output.pkl -v"
     os.system(terminnal_command)
     
     # 通过data.json姿态关键点数据保留人体躯干部分image_name.jpg
