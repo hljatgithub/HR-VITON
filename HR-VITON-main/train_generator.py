@@ -68,6 +68,7 @@ def get_opt():
     parser.add_argument("--test_datasetting", default="paired")
     parser.add_argument("--test_dataroot", default="./data/")
     parser.add_argument("--test_data_list", default="test_pairs.txt")
+    parser.add_argument("--test_count", type=int, default=500)
 
     # Hyper-parameters
     parser.add_argument('--G_lr', type=float, default=0.0001, help='initial learning rate for adam')
@@ -153,10 +154,10 @@ def train(opt, train_loader, test_loader, test_vis_loader, board, tocg, generato
     # optimizer
     optimizer_gen = torch.optim.Adam(generator.parameters(), lr=opt.G_lr, betas=(0, 0.9))
     scheduler_gen = torch.optim.lr_scheduler.LambdaLR(optimizer_gen, lr_lambda=lambda step: 1.0 -
-            max(0, step * 1000 + opt.load_step - opt.keep_step) / float(opt.decay_step + 1))
+            max(0, step * opt.lpips_count + opt.load_step - opt.keep_step) / float(opt.decay_step + 1))
     optimizer_dis = torch.optim.Adam(discriminator.parameters(), lr=opt.D_lr, betas=(0, 0.9))
     scheduler_dis = torch.optim.lr_scheduler.LambdaLR(optimizer_dis, lr_lambda=lambda step: 1.0 -
-            max(0, step * 1000 + opt.load_step - opt.keep_step) / float(opt.decay_step + 1))
+            max(0, step * opt.lpips_count + opt.load_step - opt.keep_step) / float(opt.decay_step + 1))
 
     if opt.fp16:
         if not opt.GT:
@@ -485,7 +486,7 @@ def train(opt, train_loader, test_loader, test_vis_loader, board, tocg, generato
             
             with torch.no_grad():
                 print("LPIPS")
-                for i in tqdm(range(500)):
+                for i in tqdm(range(opt.test_count)):
                     inputs = test_loader.next_batch()
                     # input
                     agnostic = inputs['agnostic'].cuda()
@@ -577,7 +578,7 @@ def train(opt, train_loader, test_loader, test_vis_loader, board, tocg, generato
                     
                     avg_distance += model.forward(T2(im), T2(output_paired))
                     
-            avg_distance = avg_distance / 500
+            avg_distance = avg_distance / opt.test_count
             print(f"LPIPS{avg_distance}")
             board.add_scalar('test/LPIPS', avg_distance, step + 1)
                 
@@ -593,7 +594,7 @@ def train(opt, train_loader, test_loader, test_vis_loader, board, tocg, generato
             save_checkpoint(generator.module, os.path.join(opt.checkpoint_dir, opt.name, 'gen_step_%06d.pth' % (step + 1)),opt)
             save_checkpoint(discriminator.module, os.path.join(opt.checkpoint_dir, opt.name, 'dis_step_%06d.pth' % (step + 1)),opt)
 
-        if (step + 1) % 1000 == 0:
+        if (step + 1) % opt.lpips_count == 0:
             scheduler_gen.step()
             scheduler_dis.step()
 
@@ -615,7 +616,7 @@ def main():
     opt.datamode = 'test'
     opt.data_list = opt.test_data_list
     test_dataset = CPDatasetTest(opt)
-    # test_dataset = Subset(test_dataset, np.arange(500)) # 文件夹2032个文件
+    # test_dataset = Subset(test_dataset, np.arange(opt.test_count)) # 文件夹2032个文件,500
     test_loader = CPDataLoader(opt, test_dataset)
     
     # test vis loader
