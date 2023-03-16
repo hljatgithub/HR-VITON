@@ -598,7 +598,9 @@ def train(opt, train_loader, test_loader, test_vis_loader, board, tocg, generato
 
         if (step + 1) % opt.lpips_count == 0:
             scheduler_gen.step()
+            print('xxxxxxxxxxxxxxxxxxxxxxx',optimizer_gen.param_groups[0]['lr'])
             scheduler_dis.step()
+            print('yyyyyyyyyyyyyyyyyyyyyy',optimizer_dis.param_groups[0]['lr'])
 
 
 def main():
