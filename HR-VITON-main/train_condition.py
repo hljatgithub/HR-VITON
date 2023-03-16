@@ -461,13 +461,14 @@ def main():
     # create test dataset & loader
     test_loader = None
     if not opt.no_test_visualize:
-        train_bsize = opt.batch_size
+        # 几个bsize不知有啥用，统一测试bsize=可视化的size
+        #train_bsize = opt.batch_size
         opt.batch_size = opt.num_test_visualize
         opt.dataroot = opt.test_dataroot
         opt.datamode = 'test'
         opt.data_list = opt.test_data_list
         test_dataset = CPDatasetTest(opt)
-        opt.batch_size = train_bsize
+        #opt.batch_size = train_bsize
         val_dataset = Subset(test_dataset, np.arange(opt.val_count)) # np.arange(2000)
         test_loader = CPDataLoader(opt, test_dataset)
         val_loader = CPDataLoader(opt, val_dataset)
