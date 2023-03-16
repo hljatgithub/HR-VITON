@@ -60,11 +60,11 @@ def get_opt():
     parser.add_argument("--save_count", type=int, default=10000)
     parser.add_argument("--load_step", type=int, default=0)
     parser.add_argument("--keep_step", type=int, default=100000)
-    parser.add_argument("--decay_step", type=int, default=100000)
+    parser.add_argument("--decay_step", type=int, default=100000) # 每n次降低学习率
     parser.add_argument("--shuffle", action='store_true', help='shuffle input data')
     
     # test
-    parser.add_argument("--lpips_count", type=int, default=1000)
+    parser.add_argument("--lpips_count", type=int, default=1000) # 每n次迭代更新学习率
     parser.add_argument("--test_datasetting", default="paired")
     parser.add_argument("--test_dataroot", default="./data/")
     parser.add_argument("--test_data_list", default="test_pairs.txt")
@@ -155,10 +155,12 @@ def train(opt, train_loader, test_loader, test_vis_loader, board, tocg, generato
     optimizer_gen = torch.optim.Adam(generator.parameters(), lr=opt.G_lr, betas=(0, 0.9))
     scheduler_gen = torch.optim.lr_scheduler.LambdaLR(optimizer_gen, lr_lambda=lambda step: 1.0 -
             max(0, step * opt.lpips_count + opt.load_step - opt.keep_step) / float(opt.decay_step + 1))
+    print('xxxxxxxxxxxxxxxxxxxxxxx',optimizer_gen.param_groups[0]['lr'])
     optimizer_dis = torch.optim.Adam(discriminator.parameters(), lr=opt.D_lr, betas=(0, 0.9))
     scheduler_dis = torch.optim.lr_scheduler.LambdaLR(optimizer_dis, lr_lambda=lambda step: 1.0 -
             max(0, step * opt.lpips_count + opt.load_step - opt.keep_step) / float(opt.decay_step + 1))
-
+    print('yyyyyyyyyyyyyyyyyyyyyy',optimizer_dis.param_groups[0]['lr'])
+    
     if opt.fp16:
         if not opt.GT:
             from apex import amp
