@@ -615,7 +615,7 @@ def main():
     opt.datamode = 'test'
     opt.data_list = opt.test_data_list
     test_dataset = CPDatasetTest(opt)
-    test_dataset = Subset(test_dataset, np.arange(500))
+    # test_dataset = Subset(test_dataset, np.arange(500)) # 文件夹2032个文件
     test_loader = CPDataLoader(opt, test_dataset)
     
     # test vis loader
