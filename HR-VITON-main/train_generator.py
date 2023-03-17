@@ -581,7 +581,7 @@ def train(opt, train_loader, test_loader, test_vis_loader, board, tocg, generato
                     
                     avg_distance += model.forward(T2(im), T2(output_paired))
                     
-            avg_distance = avg_distance / opt.num_test_visualize
+            avg_distance = avg_distance / opt.num_test
             print(f"LPIPS{avg_distance}")
             board.add_scalar('test/LPIPS', avg_distance, step + 1)
                 
