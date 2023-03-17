@@ -137,4 +137,4 @@ if __name__ == '__main__':
     for x,y in zip(x,y):
         cv2.circle(output_img, (int(x), int(y)), 8, [255,255,255], -1)
     output_img = Image.fromarray(output_img)
-    output_img.save(output_path.replace('openpose_json','openpose_img').replace('_keypoints.json','.png'))
+    output_img.save(output_path.replace('openpose_json','openpose_img').replace('_keypoints.json','_rendered.png'))
