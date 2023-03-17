@@ -121,7 +121,7 @@ for i,file in enumerate(image_list):
     #output_path = file_path + '/image-parse-v3'
     print('\n生成人体部位图segmentation') #image_name.png~用于去除原图背景，image_name_gray.png~灰度图制作索引图v3、v3.2
     # terminnal_command = "python exp/inference/inference.py --loadmodel ./inference.pth --img_path ../resized_img.jpg --output_path ../ --output_name /resized_segmentation_img"
-    terminnal_command = f"python exp/inference/inference.py --loadmodel ./inference.pth --img_path ../resized_img.jpg --output_path {output_path} --output_name /{image_name}"
+    terminnal_command = f"python exp/inference/inference.py --loadmodel ./inference.pth --img_path ../resized_img.jpg --output_path {output_path} --output_name {image_name}"
     os.system(terminnal_command)
 
 
