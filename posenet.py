@@ -5,6 +5,20 @@ from posenet.models.model_factory import load_model
 from posenet.utils import *
 import json
 import argparse
+from PIL import Image,ImageDraw
+import cv2
+import numpy as np
+
+colors = [[0,100,255], [0,100,255],   [0,255,255],
+                       [0,100,255], [0,255,255],   [0,100,255],
+                       [0,255,0],   [255,200,100], [255,0,255],
+                       [0,255,0],   [255,200,100], [255,0,255],
+                       [0,0,255],   [255,0,0],     [200,200,0],
+                       [255,0,0],   [200,200,0],   [0,0,0]]
+point_pairs = [[1,2], [1,5], [2,3], [3,4], [5,6], [6,7],
+                            [1,8], [8,9], [9,10], [1,11], [11,12], [12,13],
+                            [1,0], [0,14], [14,16], [0,15], [15,17],
+                             ]
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -78,6 +92,48 @@ if __name__ == '__main__':
 
     # VITON's .json is in ACGPN_TestData/test_pose/000001_0_keypoints.json
     # pose_name = './HR-VITON-main/test/test/openpose_json/00001_00_keypoints.json'
-    pose_name = output_path
-    with open(pose_name,'w') as f:
+    # pose_name = output_path
+    # output_path = file_path + f'/openpose_json/{image_name}_keypoints.json'
+    with open(output_path,'w') as f:
             json.dump(data, f)
+    
+    
+    ## data数据绘制图形
+    #def RGB_to_Hex(tmp):
+    #    rgb = tmp.split(',')#将RGB格式划分开来
+    #    strs = '#'
+    #    for i in rgb:
+    #        num = int(i)#将str转int
+    #        #将R、G、B分别转化为16进制拼接转换并大写
+    #        strs += str(hex(num))[-2:].replace('x','0').upper()、
+    #    return strs
+    #plt.figure(figsize=(768/100, 1024/100))
+    #plt.scatter(x, y)
+    #img = plt.imread(f'/kaggle/input/hr-viton/HR_VITOTN/data/image/{img_name}.jpg')
+    #plt.imshow(img)
+    #for i in range(len(point_pairs)):
+    #    start,end = point_pairs[i]
+    #    start_point = (x[start], x[end])
+    #    end_point = [y[start], y[end]]
+    #    color = RGB_to_Hex(','.join(map(lambda x:str(x),colors[i])))
+    #    plt.plot(start_point, end_point, color=color)
+    #plt.show()
+
+    # 画关键点图
+    keypoints = data['people'][0]['pose_keypoints_2d']
+    # 将坐标转换为x和y列表 pose_keypoints_2d 格式为x1,y1,z1,x2,y2,z2
+    x = [keypoints[i] for i in range(0, len(keypoints), 3)]
+    y = [keypoints[i] for i in range(1, len(keypoints), 3)]
+    output_img = Image.new('RGB', (728, 1024), 'black')
+    output_img = cv2.cvtColor(np.array(output_img), cv2.COLOR_BGR2RGB)
+    #draw =  ImageDraw.Draw(output_img)
+    for i in range(len(point_pairs)):
+        start,end = point_pairs[i]
+        start_point = (int(x[start]), int(y[start]))
+        end_point = (int(x[end]), int(y[end]))
+        #draw.line(tuple(start_point+end_point), fill = tuple(colors[i]), width = 5)
+        cv2.line(output_img, start_point, end_point, colors[i], 5)
+    for x,y in zip(x,y):
+        cv2.circle(output_img, (int(x), int(y)), 8, [255,255,255], -1)
+    output_img = Image.fromarray(output_img)
+    output_img.save(output_path.replace('openpose_json','openpose_img').replace('_keypoints.json','.png'))
