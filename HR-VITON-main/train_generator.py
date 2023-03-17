@@ -68,7 +68,10 @@ def get_opt():
     parser.add_argument("--test_datasetting", default="paired")
     parser.add_argument("--test_dataroot", default="./data/")
     parser.add_argument("--test_data_list", default="test_pairs.txt")
-    parser.add_argument("--test_count", type=int, default=500)
+    parser.add_argument("--num_test", type=int, default=3) # 测试集数量
+    
+    # visualize
+    parser.add_argument("--num_test_visualize", type=int, default=3) # 验证集数量和计算LPIPS的数量
 
     # Hyper-parameters
     parser.add_argument('--G_lr', type=float, default=0.0001, help='initial learning rate for adam')
@@ -107,8 +110,6 @@ def get_opt():
     parser.add_argument("--warp_feature", choices=['encoder', 'T1'], default="T1")
     parser.add_argument("--out_layer", choices=['relu', 'conv'], default="relu")
     parser.add_argument("--clothmask_composition", type=str, choices=['no_composition', 'detach', 'warp_grad'], default='warp_grad')
-    # visualize
-    parser.add_argument("--num_test_visualize", type=int, default=3)
 
     opt = parser.parse_args()
 
@@ -488,7 +489,7 @@ def train(opt, train_loader, test_loader, test_vis_loader, board, tocg, generato
             
             with torch.no_grad():
                 print("LPIPS")
-                for i in tqdm(range(opt.test_count)):
+                for i in tqdm(range(opt.num_test)):
                     inputs = test_loader.next_batch()
                     # input
                     agnostic = inputs['agnostic'].cuda()
@@ -580,7 +581,7 @@ def train(opt, train_loader, test_loader, test_vis_loader, board, tocg, generato
                     
                     avg_distance += model.forward(T2(im), T2(output_paired))
                     
-            avg_distance = avg_distance / opt.test_count
+            avg_distance = avg_distance / opt.num_test_visualize
             print(f"LPIPS{avg_distance}")
             board.add_scalar('test/LPIPS', avg_distance, step + 1)
                 
@@ -614,8 +615,9 @@ def main():
     # create dataloader
     train_loader = CPDataLoader(opt, train_dataset)
     
-    # test dataloader
-    opt.batch_size = 1
+    # test dataloader测试集
+    # opt.batch_size = 1
+    opt.batch_size = opt.num_test
     opt.dataroot = opt.test_dataroot
     opt.datamode = 'test'
     opt.data_list = opt.test_data_list
@@ -623,7 +625,7 @@ def main():
     # test_dataset = Subset(test_dataset, np.arange(opt.test_count)) # 文件夹2032个文件,500
     test_loader = CPDataLoader(opt, test_dataset)
     
-    # test vis loader
+    # test vis loader，似乎是验证集
     opt.batch_size = opt.num_test_visualize
     test_vis_dataset = CPDatasetTest(opt)
     test_vis_loader = CPDataLoader(opt, test_vis_dataset)
