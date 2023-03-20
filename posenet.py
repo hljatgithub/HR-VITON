@@ -25,9 +25,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--image_path', type=str, default='', help='person image path')
     parser.add_argument('--output_path', type=str, default='', help='000001_0_keypoints output path')
+    parser.add_argument('--model', type=str, default='train', help='train、test')
     opt = parser.parse_args()
     testfile = opt.image_path
     output_path = opt.output_path
+    model = opt.model
     
     #name="origin"
     #testfile = "origin"+".jpg"
@@ -119,22 +121,22 @@ if __name__ == '__main__':
     #    color = RGB_to_Hex(','.join(map(lambda x:str(x),colors[i])))
     #    plt.plot(start_point, end_point, color=color)
     #plt.show()
-
-    # 画关键点图
-    keypoints = data['people'][0]['pose_keypoints_2d']
-    # 将坐标转换为x和y列表 pose_keypoints_2d 格式为x1,y1,z1,x2,y2,z2
-    x = [keypoints[i] for i in range(0, len(keypoints), 3)]
-    y = [keypoints[i] for i in range(1, len(keypoints), 3)]
-    output_img = Image.new('RGB', (728, 1024), 'black')
-    output_img = cv2.cvtColor(np.array(output_img), cv2.COLOR_BGR2RGB)
-    #draw =  ImageDraw.Draw(output_img)
-    for i in range(len(point_pairs)):
-        start,end = point_pairs[i]
-        start_point = (int(x[start]), int(y[start]))
-        end_point = (int(x[end]), int(y[end]))
-        #draw.line(tuple(start_point+end_point), fill = tuple(colors[i]), width = 5)
-        cv2.line(output_img, start_point, end_point, colors[i], 5)
-    for x,y in zip(x,y):
-        cv2.circle(output_img, (int(x), int(y)), 8, [255,255,255], -1)
-    output_img = Image.fromarray(output_img)
-    output_img.save(output_path.replace('openpose_json','openpose_img').replace('_keypoints.json','_rendered.png'))
+    if model == 'train':
+        # 画关键点图
+        keypoints = data['people'][0]['pose_keypoints_2d']
+        # 将坐标转换为x和y列表 pose_keypoints_2d 格式为x1,y1,z1,x2,y2,z2
+        x = [keypoints[i] for i in range(0, len(keypoints), 3)]
+        y = [keypoints[i] for i in range(1, len(keypoints), 3)]
+        output_img = Image.new('RGB', (728, 1024), 'black')
+        output_img = cv2.cvtColor(np.array(output_img), cv2.COLOR_BGR2RGB)
+        #draw =  ImageDraw.Draw(output_img)
+        for i in range(len(point_pairs)):
+            start,end = point_pairs[i]
+            start_point = (int(x[start]), int(y[start]))
+            end_point = (int(x[end]), int(y[end]))
+            #draw.line(tuple(start_point+end_point), fill = tuple(colors[i]), width = 5)
+            cv2.line(output_img, start_point, end_point, colors[i], 5)
+        for x,y in zip(x,y):
+            cv2.circle(output_img, (int(x), int(y)), 8, [255,255,255], -1)
+        output_img = Image.fromarray(output_img)
+        output_img.save(output_path.replace('openpose_json','openpose_img').replace('_keypoints.json','_rendered.png'))
