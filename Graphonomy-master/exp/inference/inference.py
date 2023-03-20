@@ -90,7 +90,7 @@ def img_transform(img, transform=None):
     sample = transform(sample)
     return sample
 
-def inference(net, img_path='', output_path='./', output_name='f', use_gpu=True, model='test'):
+def inference(net, img_path='', output_path='./', output_name='f', use_gpu=True, model='train'):
     '''
 
     :param net:
