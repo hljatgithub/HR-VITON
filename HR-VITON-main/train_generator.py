@@ -161,6 +161,7 @@ def train(opt, train_loader, test_loader, test_vis_loader, board, tocg, generato
     scheduler_dis = torch.optim.lr_scheduler.LambdaLR(optimizer_dis, lr_lambda=lambda step: 1.0 -
             max(0, step * opt.lpips_count + opt.load_step - opt.keep_step) / float(opt.decay_step + 1))
     print('yyyyyyyyyyyyyyyyyyyyyy',optimizer_dis.param_groups[0]['lr'])
+    print(1.0 - max(0, step * opt.lpips_count + opt.load_step - opt.keep_step) / float(opt.decay_step + 1)
     
     if opt.fp16:
         if not opt.GT:
@@ -602,6 +603,7 @@ def train(opt, train_loader, test_loader, test_vis_loader, board, tocg, generato
             print('xxxxxxxxxxxxxxxxxxxxxxx',optimizer_gen.param_groups[0]['lr'])
             scheduler_dis.step()
             print('yyyyyyyyyyyyyyyyyyyyyy',optimizer_dis.param_groups[0]['lr'])
+            print(1.0 - max(0, step * opt.lpips_count + opt.load_step - opt.keep_step) / float(opt.decay_step + 1)
 
 
 def main():
