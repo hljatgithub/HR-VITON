@@ -35,14 +35,14 @@ if __name__ == '__main__':
     # Get openpose coordinate using posenet
     # 生成关键点数据00001_00_keypoints.json，修改了输入参数
     print("3、posenet生成keypoints数据················\n")
-    terminnal_command = f"python posenet.py --image_path {original_path} --output_path ./HR-VITON-main/test/test/openpose_json/00001_00_keypoints.json" 
+    terminnal_command = f"python posenet.py --image_path {original_path} --output_path ./HR-VITON-main/test/test/openpose_json/00001_00_keypoints.json --model test" 
     os.system(terminnal_command)
 
     # Generate semantic segmentation using Graphonomy-Master library
     # 人物部位识别分割、主体识别输出resized_segmentation_img
     print("4、基于Graphonomy-Master的DeepLabv3+模型生成segmentation图···············\n")
     os.chdir("./Graphonomy-master")
-    terminnal_command = "python exp/inference/inference.py --loadmodel ./inference.pth --img_path ../resized_img.jpg --output_path ../ --output_name /resized_segmentation_img"
+    terminnal_command = "python exp/inference/inference.py --loadmodel ./inference.pth --img_path ../resized_img.jpg --output_path ../ --output_name /resized_segmentation_img --model test"
     os.system(terminnal_command)
     os.chdir("../")
 
