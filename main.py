@@ -12,17 +12,21 @@ from cloths_segmentation.pre_trained_models import create_model
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--background', type=bool, default=True, help='Define removing background or not')
+    parser.add_argument('--cloth_path', type=str, default=True, help='cloth_path')
+    parser.add_argument('--original_path', type=str, default=True, help='cloth_path')
     opt = parser.parse_args()
 
     # Get mask of cloth
     # 衣服原图和黑白蒙版图另存为
     print("1、获取服装mask图···············\n")
-    cloth_path = input('1、衣服图片路径：')
+    # cloth_path = input('1、衣服图片路径：')
+    cloth_path = opt.cloth_path
     terminnal_command = f"python get_cloth_mask.py --cloth_path {cloth_path} --output_path ./HR-VITON-main/test/test/cloth-mask/00001_00.jpg" 
     os.system(terminnal_command)
     
     # Read input image # 模特原图
-    original_path = input('2、模特图片路径：')
+    #original_path = input('2、模特图片路径：')
+    original_path = opt.original_path
     img=cv2.imread(original_path)
     ori_img=cv2.resize(img,(768,1024))
     cv2.imwrite("./origin.jpg",ori_img)
