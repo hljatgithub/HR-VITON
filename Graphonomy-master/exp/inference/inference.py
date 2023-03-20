@@ -90,7 +90,7 @@ def img_transform(img, transform=None):
     sample = transform(sample)
     return sample
 
-def inference(net, img_path='', output_path='./', output_name='f', use_gpu=True):
+def inference(net, img_path='', output_path='./', output_name='f', use_gpu=True, model='test'):
     '''
 
     :param net:
@@ -172,12 +172,15 @@ def inference(net, img_path='', output_path='./', output_name='f', use_gpu=True)
     #cv2.imwrite(output_path+'/{}_gray.png'.format(output_name), results[0, :, :])
     # 灰度图，用于制作8位深索引彩图 image-parse-v3、image-parse-agnostic-v3.2 
     #cv2.imwrite(output_path.replace('segmentation', 'image-parse-v3')+'/{}.png'.format(output_name),  results[0, :, :])
-    temp = results[0, :, :] # result已经是灰度图
-    temp = cv2.resize(temp, (768, 1024), interpolation=cv2.INTER_NEAREST)
-    palette = np.array(label_colours).reshape(-1).tolist()
-    temp = Image.fromarray(temp).convert('P') # 转化为索引图
-    temp.putpalette(palette) # 插入索引对应颜色，每三个数值一个颜色
-    temp.save(output_path.replace('segmentation', 'image-parse-v3')+'/{}.png'.format(output_name))
+    if model == 'train':
+        temp = results[0, :, :] # result已经是灰度图
+        temp = cv2.resize(temp, (768, 1024), interpolation=cv2.INTER_NEAREST)
+        palette = np.array(label_colours).reshape(-1).tolist()
+        temp = Image.fromarray(temp).convert('P') # 转化为索引图
+        temp.putpalette(palette) # 插入索引对应颜色，每三个数值一个颜色
+        temp.save(output_path.replace('segmentation', 'image-parse-v3')+'/{}.png'.format(output_name))
+    else:
+        cv2.imwrite(output_path+'/{}_gray.png'.format(output_name), results[0, :, :])
     
     end_time = timeit.default_timer()
     print('time used for the multi-scale image inference' + ' is :' + str(end_time - start_time))
@@ -191,6 +194,7 @@ if __name__ == '__main__':
     parser.add_argument('--output_path', default='', type=str)
     parser.add_argument('--output_name', default='', type=str)
     parser.add_argument('--use_gpu', default=1, type=int)
+    parser.add_argument('--model', default='test', type=str)
     opts = parser.parse_args()
     # deeplab_xception_transfer_projection_synBN_savemem分布式跨卡训练，对应SynchronizedBatchNorm2d
     net = deeplab_xception_transfer.deeplab_xception_transfer_projection_savemem(n_classes=20,
@@ -211,5 +215,5 @@ if __name__ == '__main__':
         use_gpu = False
         raise RuntimeError('must use the gpu!!!!')
 
-    inference(net=net, img_path=opts.img_path,output_path=opts.output_path , output_name=opts.output_name, use_gpu=use_gpu)
+    inference(net=net, img_path=opts.img_path,output_path=opts.output_path , output_name=opts.output_name, use_gpu=use_gpu, model=opts.model)
 
